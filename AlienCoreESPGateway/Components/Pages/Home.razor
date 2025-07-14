@@ -1,5 +1,36 @@
 ﻿@page "/"
+@inject NavigationManager nv
+@using Microsoft.AspNetCore.SignalR.Client;
+@inject HubConnection hub
 
-<h1>Hello, world!</h1>
+<h1>Live Telemetry</h1>
 
-Welcome to your new app.
+@if (messages.Count == 0)
+{
+    <p><em>Waiting for data...</em></p>
+}
+else
+{
+    <ul>
+        @foreach (var msg in messages)
+        {
+            <li>@msg</li>
+        }
+    </ul>
+}
+
+@code {
+
+    private List<string> messages = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        hub.On<string, string>("Receive", (topic, payload) =>
+        {
+            messages.Add($"{DateTime.Now:T} {topic} -> {payload}");
+            InvokeAsync(StateHasChanged);
+        });
+
+        await hub.StartAsync();
+    }
+}
