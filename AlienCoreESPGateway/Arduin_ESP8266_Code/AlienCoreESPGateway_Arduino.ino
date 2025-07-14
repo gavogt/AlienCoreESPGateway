@@ -8,7 +8,7 @@ char pass[]     = "Your password";
 
 const char* mqttServer = "192.168.x.xxx";  
 const uint16_t mqttPort = 1883;
-const char*  mqttTopic = "xeno/uno-scout/sound";
+const char*  mqttTopic = "xeno/uno-scout/telemetry";
 WiFiEspClient wifiClient;
 PubSubClient  mqttClient(wifiClient);
 
