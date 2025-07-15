@@ -5,14 +5,14 @@
 
 <h1>Live Telemetry</h1>
 
-@if (messages.Count == 0)
+@if (!TopMessages.Any())
 {
     <p><em>Waiting for data...</em></p>
 }
 else
 {
     <ul>
-        @foreach (var msg in messages)
+        @foreach (var msg in TopMessages)
         {
             <li>@msg</li>
         }
@@ -22,6 +22,20 @@ else
 @code {
 
     private List<string> messages = new();
+
+    private List<string> TopMessages
+    {
+        get
+        {
+            if(messages.Count <= 10)
+            {
+                return messages;
+            }
+            int startIndex = messages.Count - 10;
+            return messages.GetRange(startIndex, 10);
+        }
+
+    }
 
     protected override async Task OnInitializedAsync()
     {
