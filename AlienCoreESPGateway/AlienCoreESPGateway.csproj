@@ -63,6 +63,7 @@
     <ItemGroup>
       <Content Include="Arduin_ESP8266_Firmware\AlienCoreESPGateway_Arduino_R3.ino" />
       <Content Include="Arduin_ESP8266_Firmware\AlienCoreESP_Gateway_Arduino_R4.ino" />
+      <Content Include="Arduin_ESP8266_Firmware\Gateway_R4_Arduino_EEPROM.ino" />
     </ItemGroup>
 
     <ItemGroup>
