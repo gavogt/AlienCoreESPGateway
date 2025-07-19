@@ -1,0 +1,36 @@
+﻿<h3>Login</h3>
+
+<EditForm Model="@model" OnInvalidSubmit="HandleSubmit">
+    <div class="container">
+        <div class="row">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="card-title">Login</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <InputText id="username" @bind-Value="@model.Username" class="form-control" placeholder="Username" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <InputText id="password" @bind-Value="@model.Password" class="form-control" type="password" placeholder="Password" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    LoginModel model = new LoginModel();
+
+    private async Task HandleSubmit()
+    {
+        if (string.IsNullOrWhiteSpace(model.Username) || string.IsNullOrWhiteSpace(model.Password))
+        {
+            return;
+        }
+    }
+
+}
