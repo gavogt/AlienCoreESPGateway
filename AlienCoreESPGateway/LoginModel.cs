@@ -10,7 +10,7 @@ namespace AlienCoreESPGateway
     public class LoginModel
     {
         [Required]
-        public string Username { get; set; } = String.Empty;
+        public string Email { get; set; } = String.Empty;
         [Required]
         public string Password { get; set; } = String.Empty;
 
