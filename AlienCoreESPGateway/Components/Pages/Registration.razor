@@ -1,4 +1,6 @@
 ﻿@page "/registration"
+@inject RegisterDatabaseService registerDatabaseService  
+@inject NavigationManager navigationManager
 
 <EditForm Model="@model" OnValidSubmit="HandleRegistration">
   <div class="container">
@@ -59,9 +61,18 @@
 
 @code {
     RegistrationModel model = new RegistrationModel();
+    private string _error = null;
 
     private async Task HandleRegistration()
     {
-        // todo
+        var ok = await registerDatabaseService.RegisterUserAsync(model);
+        if (ok)
+        {
+            navigationManager.NavigateTo("/login");
+        }
+        else
+        {
+            _error = "Registration failed. Please try again.";
+        }
     }
 }

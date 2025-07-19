@@ -1,5 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.EntityFrameworkCore.SqlServer;
 namespace AlienCoreESPGateway
 {
     public static class MauiProgram
@@ -18,6 +21,13 @@ namespace AlienCoreESPGateway
             .WithAutomaticReconnect()
             .Build()
             );
+
+            builder.Services.AddDbContextFactory<RegisterDBContext>(options =>
+                options.UseSqlServer(
+                    @"Server=.\SQLEXPRESS;Database=AlienCoreESPGateway;Trusted_Connection=True;TrustServerCertificate=True;"
+                    )
+            );
+            builder.Services.AddScoped<RegisterDatabaseService>();
             builder.Services.AddMauiBlazorWebView();
 
 #if DEBUG
@@ -25,7 +35,22 @@ namespace AlienCoreESPGateway
             builder.Logging.AddDebug();
 #endif
 
-            return builder.Build();
+            var app = builder.Build();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<RegisterDBContext>>();
+
+                using var db = factory.CreateDbContext();
+
+                bool canConnect = db.Database.CanConnect();
+
+                System.Diagnostics.Debug.WriteLine(canConnect ? "Database connection successful." : "Database connection failed.");
+
+            }
+
+            return app;
+
         }
     }
 }
