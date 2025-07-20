@@ -1,5 +1,7 @@
 ﻿@inherits LayoutComponentBase
+@inject SessionState SessionState
 
+<CascadingValue Value="SessionState">
 <div class="page">
     <div class="sidebar">
         <NavMenu />
@@ -15,3 +17,4 @@
         </article>
     </main>
 </div>
+</CascadingValue>

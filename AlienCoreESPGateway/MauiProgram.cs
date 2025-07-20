@@ -28,6 +28,7 @@ namespace AlienCoreESPGateway
                     )
             );
             builder.Services.AddScoped<RegisterDatabaseService>();
+            builder.Services.AddSingleton<SessionState>();
             builder.Services.AddMauiBlazorWebView();
 
 #if DEBUG
