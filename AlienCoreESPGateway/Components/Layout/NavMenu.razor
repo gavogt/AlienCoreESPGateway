@@ -14,17 +14,30 @@
                 <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
             </NavLink>
         </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="registration">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Registration
-            </NavLink>
-        </div>
+        @if (SessionState?.CurrentUser is null)
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="registration">
+                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Registration
+                </NavLink>
+            </div>
+        }
+
+        @if (SessionState?.CurrentUser is not null)
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="telemetry">
+                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Telemetry
+                </NavLink>
+            </div>
+        }
+
         @if (SessionState?.CurrentUser is null)
         {
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="login">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Login
-            </NavLink>
+                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Login
+                </NavLink>
             </div>
         }
         else
@@ -35,22 +48,18 @@
                 </NavLink>
             </div>
         }
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="telemetry">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Telemetry
-            </NavLink>
-        </div>
+
     </nav>
 </div>
 
 
-@code{
+@code {
     [CascadingParameter]
     SessionState? SessionState { get; set; }
 
     private void LogOut()
     {
-        if(SessionState?.CurrentUser is not null)
+        if (SessionState?.CurrentUser is not null)
         {
             SessionState.CurrentUser = null;
             nav.NavigateTo("/login");
