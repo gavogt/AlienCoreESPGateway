@@ -5,30 +5,32 @@
 
 <EditForm Model="@model" OnValidSubmit="HandleSubmit">
     <div class="container">
-        <div class="row">
-            <div class="card shadow-sm">
-                <div class="card-header">
-                    <h5 class="card-title">Login</h5>
-                </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <InputText id="username" @bind-Value="@model.Email" class="form-control" placeholder="Enter Email..." />
+        <div class="row justify-content-center mt-5">
+            <div class="col-12 col-sm-8 col-md-6 col-lg-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="card-title mb-4">Login</h5>
                     </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <InputText id="password" @bind-Value="@model.Password" class="form-control" type="password" placeholder="Enter Password..." />
-                    </div>
-                    <button type="submit" class="btn btn-primary">Login</button>
-                </div>
-                <div class="card-footer">
-                    @if (!string.IsNullOrEmpty(_errorMessage))
-                    {
-                        <div class="alert alert-danger" role="alert">
-                            @_errorMessage
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <InputText id="username" @bind-Value="@model.Email" class="form-control" placeholder="Enter Email..." />
                         </div>
-                    }
-                    <p class="mt-2">Don't have an account? <a href="/registration">Register here</a>.</p>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <InputText id="password" @bind-Value="@model.Password" class="form-control" type="password" placeholder="Enter Password..." />
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Login</button>
+                    </div>
+                    <div class="card-footer">
+                        @if (!string.IsNullOrEmpty(_errorMessage))
+                        {
+                            <div class="alert alert-danger" role="alert">
+                                @_errorMessage
+                            </div>
+                        }
+                        <p class="mt-2">Don't have an account? <a href="/registration">Register here</a>.</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -48,7 +50,7 @@
 
             var user = await db.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
 
-            if(user is null)
+            if (user is null)
             {
                 _errorMessage = "Invalid email or password";
                 return;
@@ -65,7 +67,7 @@
             // Login successful, redirect to home page
             navigationManager.NavigateTo("/");
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             _errorMessage = $"An error occurred while processing your request: {ex.Message}";
         }
