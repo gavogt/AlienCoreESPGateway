@@ -62,9 +62,12 @@
 @code {
     RegistrationModel model = new RegistrationModel();
     private string _error = null;
+    PasswordHasher passwordHasher = new PasswordHasher();
 
     private async Task HandleRegistration()
     {
+        model.Password = passwordHasher.HashPassword(model.Password);
+
         var ok = await registerDatabaseService.RegisterUserAsync(model);
         if (ok)
         {
