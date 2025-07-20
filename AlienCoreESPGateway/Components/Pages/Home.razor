@@ -27,7 +27,7 @@ else
     {
         get
         {
-            if(messages.Count <= 10)
+            if (messages.Count <= 10)
             {
                 return messages;
             }
@@ -45,6 +45,8 @@ else
             InvokeAsync(StateHasChanged);
         });
 
-        await hub.StartAsync();
+        if (hub.State == HubConnectionState.Disconnected) { 
+            await hub.StartAsync(); 
+        }
     }
 }

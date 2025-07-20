@@ -1,6 +1,9 @@
 ﻿@page "/login"
+@using Microsoft.EntityFrameworkCore;
+@inject NavigationManager navigationManager
+@inject IDbContextFactory<RegisterDBContext> dbFactory
 
-<EditForm Model="@model" OnInvalidSubmit="HandleSubmit">
+<EditForm Model="@model" OnValidSubmit="HandleSubmit">
     <div class="container">
         <div class="row">
             <div class="card shadow-sm">
@@ -18,6 +21,15 @@
                     </div>
                     <button type="submit" class="btn btn-primary">Login</button>
                 </div>
+                <div class="card-footer">
+                    @if (!string.IsNullOrEmpty(_errorMessage))
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            @_errorMessage
+                        </div>
+                    }
+                    <p class="mt-2">Don't have an account? <a href="/registration">Register here</a>.</p>
+                </div>
             </div>
         </div>
     </div>
@@ -25,12 +37,37 @@
 
 @code {
     LoginModel model = new LoginModel();
+    private string _errorMessage = string.Empty;
+    private PasswordHasher _passwordHasher = new PasswordHasher();
 
     private async Task HandleSubmit()
     {
-        if (string.IsNullOrWhiteSpace(model.Email) || string.IsNullOrWhiteSpace(model.Password))
+        try
         {
-            return;
+            using var db = dbFactory.CreateDbContext();
+
+            var user = await db.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
+
+            if(user is null)
+            {
+                _errorMessage = "Invalid email or password";
+                return;
+            }
+            bool ok = _passwordHasher.Verify(user.Password, model.Password);
+
+            if (!ok)
+            {
+                _errorMessage = "Invalid email or password";
+                return;
+
+            }
+
+            // Login successful, redirect to home page
+            navigationManager.NavigateTo("/");
+        }
+        catch(Exception ex)
+        {
+            _errorMessage = $"An error occurred while processing your request: {ex.Message}";
         }
     }
 

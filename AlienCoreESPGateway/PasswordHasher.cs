@@ -29,7 +29,7 @@ namespace AlienCoreESPGateway
 
         public bool Verify(string hashedPassword, string plaintextPassword)
         {
-            var result = _hasher.VerifyHashedPassword(null, hashedPassword, plaintextPassword);
+            var result = _hasher.VerifyHashedPassword(null!, hashedPassword, plaintextPassword);
             return result != PasswordVerificationResult.Failed;
 
         }
