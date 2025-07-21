@@ -1,52 +1,84 @@
 ﻿@page "/telemetry"
 @inject NavigationManager nv
 @using Microsoft.AspNetCore.SignalR.Client;
+@using System.Text.Json
+@using System.Text.Json.Serialization;
 @inject HubConnection hub
 
-<h1>Live Telemetry</h1>
-
-@if (!TopMessages.Any())
-{
-    <p><em>Waiting for data...</em></p>
-}
-else
-{
-    <ul>
-        @foreach (var msg in TopMessages)
-        {
-            <li>@msg</li>
-        }
-    </ul>
-}
-
+<div class="container">
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h2 class="card-title">Telemetry</h2>
+        </div>
+        <div class="card-body">
+            @if (messages.Count == 0)
+            {
+                <p><em>Waiting for data...</em></p>
+            }
+            else
+            {
+                <table class="table table-striped table-hover">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Time</th>
+                            <th>Scout ID</th>
+                            <th>Module</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var msg in messages)
+                        {
+                            @foreach (var mod in msg.Modules)
+                            {
+                                <tr>
+                                    <td>@msg.Timestamp.TimeOfDay</td>
+                                    <td>@msg.ScoutId</td>
+                                    <td>@mod.Type</td>
+                                    <td>@mod.Value</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+</div>
 @code {
 
-    private List<string> messages = new();
-
-    private List<string> TopMessages
-    {
-        get
-        {
-            if (messages.Count <= 10)
-            {
-                return messages;
-            }
-            int startIndex = messages.Count - 10;
-            return messages.GetRange(startIndex, 10);
-        }
-
-    }
+    private List<TelemetryMessage> messages = new();
 
     protected override async Task OnInitializedAsync()
     {
-        hub.On<string, string>("Receive", (topic, payload) =>
+        // Subscribe to the SignalR hub
+        hub.On<string, string>("Receive", async (topic, payload) =>
+
         {
-            messages.Add($"{DateTime.Now:T} {topic} -> {payload}");
-            InvokeAsync(StateHasChanged);
+            try
+            {
+                var msg = JsonSerializer.Deserialize<TelemetryMessage>(payload);
+                if (msg is null) return;
+
+                messages.Add(msg);
+                if (messages.Count > 3)
+                {
+                    messages.RemoveAt(0); // Keep the last 3 messages
+                }
+
+
+                await InvokeAsync(StateHasChanged);
+            }
+            catch (JsonException ex)
+            {
+                Console.Error.WriteLine($"Failed to deserialize telemetry message: {ex.Message}");
+            }
         });
 
-        if (hub.State == HubConnectionState.Disconnected) { 
-            await hub.StartAsync(); 
+        if (hub.State == HubConnectionState.Disconnected)
+        {
+            await hub.StartAsync();
+
         }
     }
 }

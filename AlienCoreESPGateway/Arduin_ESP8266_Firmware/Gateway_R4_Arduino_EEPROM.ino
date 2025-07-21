@@ -1,6 +1,4 @@
-﻿ 
-<!--
-#include <WiFiS3.h>
+﻿/*#include <WiFiS3.h>
 #include <ArduinoMqttClient.h>
 #include <Arduino_LED_Matrix.h>
 #include <EEPROM.h>
@@ -149,4 +147,5 @@ Serial.println(F("👾 LED‑Matrix: smile frame 0"));
 matrix.renderBitmap(sm0,8,12); delay(150);
 Serial.println(F("😉 LED‑Matrix: smile frame 1"));
 matrix.renderBitmap(sm1,8,12); delay(150);
-}
+}*/
+
