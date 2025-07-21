@@ -1,7 +1,12 @@
 version: '3.8'
+
 services:
   quantumqueue:
     image: rabbitmq:3-management
     ports:
-      - "5672:5672"
-      - "15672:15672"    
+      - "5672:5672"    # AMQP
+      - "15672:15672"  # Management UI
+      - "1883:1883"    # MQTT
+    environment:
+      RABBITMQ_DEFAULT_USER: scout
+      RABBITMQ_DEFAULT_PASS: passw0rd
