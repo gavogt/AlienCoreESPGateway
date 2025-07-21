@@ -10,3 +10,22 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: scout
       RABBITMQ_DEFAULT_PASS: passw0rd
+
+  influxdb:
+    image: influxdb:2.1
+    container_name: influxdb
+    ports:
+      - "8086:8086"    # InfluxDB HTTP API
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: admin
+      DOCKER_INFLUXDB_INIT_PASSWORD: SuperSecretPa55
+      DOCKER_INFLUXDB_INIT_ORG: XenoTelemetry
+      DOCKER_INFLUXDB_INIT_BUCKET: telemetry
+      DOCKER_INFLUXDB_INIT_RETENTION: 7d
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: sk_xeno_admin_token
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+
+volumes:
+  influxdb_data:
