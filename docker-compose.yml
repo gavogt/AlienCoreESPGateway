@@ -1,21 +1,18 @@
-version: '3.8'
-
 services:
   quantumqueue:
     image: rabbitmq:3-management
     ports:
-      - "5672:5672"    # AMQP
-      - "15672:15672"  # Management UI
-      - "1883:1883"    # MQTT
+      - "5672:5672"
+      - "15672:15672"
+      - "1883:1883"
     environment:
       RABBITMQ_DEFAULT_USER: scout
       RABBITMQ_DEFAULT_PASS: passw0rd
 
   influxdb:
     image: influxdb:2.1
-    container_name: influxdb
     ports:
-      - "8086:8086"    # InfluxDB HTTP API
+      - "8086:8086"
     environment:
       DOCKER_INFLUXDB_INIT_MODE: setup
       DOCKER_INFLUXDB_INIT_USERNAME: admin
@@ -27,5 +24,14 @@ services:
     volumes:
       - influxdb_data:/var/lib/influxdb2
 
+  telegraf:
+    image: telegraf:1.30
+    depends_on:
+      - quantumqueue
+      - influxdb
+    volumes:
+      - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    ports:
+      - "8125:8125/udp"  
 volumes:
   influxdb_data:
