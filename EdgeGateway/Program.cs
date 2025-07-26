@@ -11,8 +11,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 var config = builder.Configuration;
 
+var urlConfig = config["Urls"]
+    ?? throw new InvalidOperationException("Missing `Urls` configuration");
+var urls = urlConfig
+    .Split(';', StringSplitOptions.RemoveEmptyEntries);
+builder.WebHost.UseUrls(urls);
+
 var mqttSection = config.GetSection("MqttOptions");
-var mqttOpts = mqttSection.Get<MqttOptions>();
+var mqttOpts = mqttSection.Get<MqttOptions>()!;
 
 builder.Services.AddSignalR();
 
@@ -33,13 +39,10 @@ builder.Services.AddSingleton<IMqttClient>(sp =>
 
 var app = builder.Build();
 
-app.Urls.Clear();
-foreach(var url in config["Urls"]!.Split(';',StringSplitOptions.RemoveEmptyEntries))
-{
-    app.Urls.Add(url);
-}
-
 var hubPath = config["SignalR:HubPath"] ?? "/telemetryHub";
+
+app.MapGet("/", () => Results.Redirect(hubPath));
+
 app.MapHub<TelemetryHub>(hubPath);
 
 app.Run();

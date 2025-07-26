@@ -15,9 +15,12 @@ namespace AlienCoreESPGateway
 
             var asm = Assembly.GetExecutingAssembly();
             using var stream = asm.GetManifestResourceStream("AlienCoreESPGateway.appsettings.json");
+            if (stream == null)
+                throw new InvalidOperationException("Cannot find embedded resource appsettings.json");
+
             var config = new ConfigurationBuilder()
-                .AddJsonStream(stream!)
-                .Build();
+                            .AddJsonStream(stream)
+                            .Build();
 
             builder.Configuration.AddConfiguration(config);
 
