@@ -1,0 +1,13 @@
+{
+    "MqttOptions": {
+        "ClientId": "EdgeGateway",
+        "Server": "192.168.x.xxx",
+        "Port": 1883,
+        "CleanSession": true
+
+    },
+    "SignalR": {
+        "HubPath": "/telemetryHub"
+    },
+    "Urls": "http://192.168.x.xxx:5000"
+}

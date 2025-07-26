@@ -1,0 +1,8 @@
+{
+    "ConnectionStrings": {
+        "DefaultConnection": "Server=ChangeHere\\SQLEXPRESS;Database=AlienCoreESPGateway;Trusted_Connection=True;TrustServerCertificate=True;"
+    },
+    "SignalR": {
+        "HubUrl": "http://192.168.x.xxx:5000/telemetryHub"
+    }
+}
