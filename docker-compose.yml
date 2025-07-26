@@ -1,13 +1,14 @@
-services:
+﻿services:
   quantumqueue:
     image: rabbitmq:3-management
+    container_name: rabbitmq
     ports:
       - "5672:5672"
       - "15672:15672"
       - "1883:1883"
     environment:
-      RABBITMQ_DEFAULT_USER: scout
-      RABBITMQ_DEFAULT_PASS: passw0rd
+      RABBITMQ_DEFAULT_USER:        scout
+      RABBITMQ_DEFAULT_PASS:        passw0rd
 
   influxdb:
     image: influxdb:2.1
@@ -30,7 +31,7 @@ services:
       - quantumqueue
       - influxdb
     volumes:
-      - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - "./telegraf.conf:/etc/telegraf/telegraf.conf:ro"
     ports:
       - "8125:8125/udp"  
 volumes:
