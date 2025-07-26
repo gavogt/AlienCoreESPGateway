@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.SqlServer;
+using Microsoft.Extensions.Configuration;
+using System.Reflection;
 namespace AlienCoreESPGateway
 {
     public static class MauiProgram
@@ -10,25 +12,39 @@ namespace AlienCoreESPGateway
         public static MauiApp CreateMauiApp()
         {
             var builder = MauiApp.CreateBuilder();
+
+            var asm = Assembly.GetExecutingAssembly();
+            using var stream = asm.GetManifestResourceStream("AlienCoreESPGateway.appsettings.json");
+            var config = new ConfigurationBuilder()
+                .AddJsonStream(stream!)
+                .Build();
+
+            builder.Configuration.AddConfiguration(config);
+
             builder
                 .UseMauiApp<App>()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 });
-            builder.Services.AddSingleton(sp => new HubConnectionBuilder()
-            .WithUrl("http://192.168.1.162:5000/telemetryHub")
-            .WithAutomaticReconnect()
-            .Build()
-            );
+
+            var hubURL = builder.Configuration["SignalR:HubURL"]!;
+            var sqlConn = builder.Configuration.GetConnectionString("DefaultConnection")!;
+
+            builder.Services.AddSingleton(sp =>
+                new HubConnectionBuilder()
+                .WithUrl(hubURL)
+                .WithAutomaticReconnect()
+                .Build()
+                );
 
             builder.Services.AddDbContextFactory<RegisterDBContext>(options =>
-                options.UseSqlServer(
-                    @"Server=.\SQLEXPRESS;Database=AlienCoreESPGateway;Trusted_Connection=True;TrustServerCertificate=True;"
-                    )
+                options.UseSqlServer(sqlConn)
             );
             builder.Services.AddScoped<RegisterDatabaseService>();
             builder.Services.AddSingleton<SessionState>();
+
+
             builder.Services.AddMauiBlazorWebView();
 
 #if DEBUG
