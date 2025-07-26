@@ -4,8 +4,15 @@ using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Client.Options;
 using MQTTnet.Client.Subscribing;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var config = builder.Configuration;
+
+var mqttSection = config.GetSection("MqttOptions");
+var mqttOpts = mqttSection.Get<MqttOptions>();
 
 builder.Services.AddSignalR();
 
@@ -15,16 +22,24 @@ builder.Services.AddSingleton<IMqttClient>(sp =>
     var factory = new MqttFactory();
     var mqttClient = factory.CreateMqttClient();
     var options = new MqttClientOptionsBuilder()
-        .WithClientId("EdgeGateway")
-        .WithTcpServer("192.168.1.164", 1883)
-        .WithCleanSession()
+        .WithClientId(mqttOpts.ClientId)
+        .WithTcpServer(mqttOpts.Server, mqttOpts.Port)
+        .WithCleanSession(mqttOpts.CleanSession)
         .Build();
+
     mqttClient.ConnectAsync(options, CancellationToken.None).Wait();
     return mqttClient;
 });
+
 var app = builder.Build();
+
 app.Urls.Clear();
-app.Urls.Add("http://192.168.1.162:5000");
-app.MapHub<TelemetryHub>("/telemetryHub");
+foreach(var url in config["Urls"]!.Split(';',StringSplitOptions.RemoveEmptyEntries))
+{
+    app.Urls.Add(url);
+}
+
+var hubPath = config["SignalR:HubPath"] ?? "/telemetryHub";
+app.MapHub<TelemetryHub>(hubPath);
 
 app.Run();
