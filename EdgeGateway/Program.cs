@@ -30,7 +30,8 @@ builder.Services.AddSingleton<IMqttClient>(sp =>
     var options = new MqttClientOptionsBuilder()
         .WithClientId(mqttOpts.ClientId)
         .WithTcpServer(mqttOpts.Server, mqttOpts.Port)
-        .WithCleanSession(mqttOpts.CleanSession)
+        .WithCredentials("scout", "passw0rd")
+        .WithCleanSession()
         .Build();
 
     mqttClient.ConnectAsync(options, CancellationToken.None).Wait();
