@@ -25,6 +25,17 @@
     volumes:
       - influxdb_data:/var/lib/influxdb2
 
+  xeno-bridge:
+    build:                  
+        context: .              
+        dockerfile: ./EdgeGateway/Dockerfile  
+    depends_on:
+    - quantumqueue
+    environment:
+        RABBITMQ_HOST: quantumqueue
+        RABBITMQ_USER: scout
+        RABBITMQ_PASS: passw0rd
+
   telegraf:
     image: telegraf:1.30
     depends_on:
