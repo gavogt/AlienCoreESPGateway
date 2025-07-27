@@ -1,23 +1,44 @@
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+
 namespace XenoBridge;
 
 public class Worker : BackgroundService
 {
-    private readonly ILogger<Worker> _logger;
+    readonly ConnectionFactory _factory;
+    readonly ILogger<Worker> _log;
 
-    public Worker(ILogger<Worker> logger)
+    public Worker(ConnectionFactory factory, ILogger<Worker> log)
     {
-        _logger = logger;
+        _factory = factory;
+        _log = log;
     }
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override Task ExecuteAsync(CancellationToken stop)
     {
-        while (!stoppingToken.IsCancellationRequested)
+        using var conn = _factory.CreateConnection();
+        using var channel = conn.CreateModel();
+
+        channel.ExchangeDeclare("xenotelemetry", ExchangeType.Fanout, durable: true);
+        var queue = channel.QueueDeclare().QueueName;
+        channel.QueueBind(queue, "xenotelemetry", "");
+
+        var consumer = new EventingBasicConsumer(channel);
+        consumer.Received += (_, ea) =>
         {
-            if (_logger.IsEnabled(LogLevel.Information))
-            {
-                _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-            }
-            await Task.Delay(1000, stoppingToken);
-        }
+            var json = Encoding.UTF8.GetString(ea.Body.ToArray());
+            _log.LogInformation("Telemetry: {json}", json);
+            channel.BasicAck(ea.DeliveryTag, false);
+        };
+
+        channel.BasicConsume(queue, false, consumer);
+        _log.LogInformation("Listening on {q}", queue);
+
+        return Task.Delay(-1, stop);
     }
 }
