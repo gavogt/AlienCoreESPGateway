@@ -1,84 +1,157 @@
 ﻿@page "/telemetry"
-@inject NavigationManager nv
-@using Microsoft.AspNetCore.SignalR.Client;
+@using Syncfusion.Blazor.Charts
+@using Microsoft.AspNetCore.SignalR.Client
 @using System.Text.Json
-@using System.Text.Json.Serialization;
+@using System.Collections.ObjectModel
+@using System.Linq
 @inject HubConnection hub
+@inject NavigationManager nav
 
-<div class="container">
-    <div class="card shadow-sm">
-        <div class="card-header">
-            <h2 class="card-title">Telemetry</h2>
-        </div>
-        <div class="card-body">
-            @if (messages.Count == 0)
-            {
-                <p><em>Waiting for data...</em></p>
-            }
-            else
-            {
-                <table class="table table-striped table-hover">
-                    <thead class="table-primary">
-                        <tr>
-                            <th>Time</th>
-                            <th>Scout ID</th>
-                            <th>Module</th>
-                            <th>Value</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var msg in messages)
-                        {
-                            @foreach (var mod in msg.Modules)
-                            {
-                                <tr>
-                                    <td>@msg.Timestamp.TimeOfDay</td>
-                                    <td>@msg.ScoutId</td>
-                                    <td>@mod.Type</td>
-                                    <td>@mod.Value</td>
-                                </tr>
-                            }
-                        }
-                    </tbody>
-                </table>
-            }
-        </div>
-    </div>
+<div class="container mt-4">
+	<div class="row justify-content-center">
+		<div class="col-auto">
+			<h3 class="text-center">Syncfusion ChartJs</h3>
+			<SfChart Height="350px" Width="700px" Title="Telemetry Modules">
+				<!-- X axis: timestamps as categories -->
+				<ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.DateTimeCategory"
+								   LabelFormat="HH:mm:ss"
+								   Title="Timestamp" />
+
+				<!-- Y axis: raw values -->
+				<ChartPrimaryYAxis Title="Value"
+								   LabelFormat="{value}" />
+
+				<!-- legend at top -->
+				<ChartLegendSettings Visible="true" Position="LegendPosition.Top" />
+
+				<ChartSeriesCollection>
+					<!-- NEURO -->
+					<ChartSeries DataSource="@_neuroRows"
+								 XName="TimeStamp"
+								 YName="Value"
+								 Type="ChartSeriesType.StackingLine"
+								 Name="NEURO"
+								 Width="2" />
+
+					<!-- PLASMA -->
+					<ChartSeries DataSource="@_plasmaRows"
+								 XName="TimeStamp"
+								 YName="Value"
+								 Type="ChartSeriesType.StackingLine"
+								 Name="PLASMA"
+								 Width="2" />
+
+					<!-- BIO -->
+					<ChartSeries DataSource="@_bioRows"
+								 XName="TimeStamp"
+								 YName="Value"
+								 Type="ChartSeriesType.StackingLine"
+								 Name="BIO"
+								 Width="2" />
+				</ChartSeriesCollection>
+			</SfChart>
+		</div>
+	</div>
 </div>
+<!-- ============ RAW TABLE ============ -->
+<div class="container mt-4">
+	<div class="card shadow-sm">
+		<div class="card-header"><h2 class="card-title">Telemetry</h2></div>
+		<div class="card-body">
+			@if (messages.Count == 0)
+			{
+				<p><em>Waiting for data…</em></p>
+			}
+			else
+			{
+				<table class="table table-striped table-hover">
+					<thead class="table-primary">
+						<tr><th>Time</th><th>Scout ID</th><th>Module</th><th>Value</th></tr>
+					</thead>
+					<tbody>
+						@foreach (var msg in messages)
+						{
+							@foreach (var mod in msg.Modules)
+							{
+								<tr>
+									<td>@msg.Timestamp.TimeOfDay</td>
+									<td>@msg.ScoutId</td>
+									<td>@mod.Type</td>
+									<td>@mod.Value</td>
+								</tr>
+							}
+						}
+					</tbody>
+				</table>
+			}
+		</div>
+	</div>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(_err))
+{
+	<div class="alert alert-danger mt-3">@_err</div>
+}
+
 @code {
+	// raw telemetry messages for the table
+	private readonly List<TelemetryMessage> messages = new();
+	private string? _err;
 
-    private List<TelemetryMessage> messages = new();
+	// three series buffers, auto‐refreshing via ObservableCollection
+	private readonly ObservableCollection<ModuleRow> _neuroRows = new();
+	private readonly ObservableCollection<ModuleRow> _plasmaRows = new();
+	private readonly ObservableCollection<ModuleRow> _bioRows = new();
 
-    protected override async Task OnInitializedAsync()
-    {
-        // Subscribe to the SignalR hub
-        hub.On<string, string>("Receive", async (topic, payload) =>
+	private const int MaxPoints = 200;
 
-        {
-            try
-            {
-                var msg = JsonSerializer.Deserialize<TelemetryMessage>(payload);
-                if (msg is null) return;
+	protected override async Task OnInitializedAsync()
+	{
+		// subscribe
+		hub.On<string, string>("Receive", (topic, payload) =>
+		{
+			try
+			{
+				var msg = JsonSerializer.Deserialize<TelemetryMessage>(payload);
+				if (msg is null) return;
 
-                messages.Add(msg);
-                if (messages.Count > 3)
-                {
-                    messages.RemoveAt(0); // Keep the last 3 messages
-                }
+				// table history
+				messages.Add(msg);
+				if (messages.Count > MaxPoints)
+					messages.RemoveAt(0);
 
+				// add to row based on type
+				foreach (var mod in msg.Modules)
+				{
+					var pt = new ModuleRow(msg.Timestamp, mod.Value);
+					switch (mod.Type.ToUpperInvariant())
+					{
+						case "NEURO":
+							_neuroRows.Add(pt);
+							if (_neuroRows.Count > MaxPoints) _neuroRows.RemoveAt(0);
+							break;
+						case "PLASMA":
+							_plasmaRows.Add(pt);
+							if (_plasmaRows.Count > MaxPoints) _plasmaRows.RemoveAt(0);
+							break;
+						case "BIO":
+							_bioRows.Add(pt);
+							if (_bioRows.Count > MaxPoints) _bioRows.RemoveAt(0);
+							break;
+					}
+				}
 
-                await InvokeAsync(StateHasChanged);
-            }
-            catch (JsonException ex)
-            {
-                Console.Error.WriteLine($"Failed to deserialize telemetry message: {ex.Message}");
-            }
-        });
+				InvokeAsync(StateHasChanged);
+			}
+			catch (Exception ex)
+			{
+				_err = ex.Message;
+				InvokeAsync(StateHasChanged);
+			}
+		});
 
-        if (hub.State == HubConnectionState.Disconnected)
-        {
-            await hub.StartAsync();
-
-        }
-    }
+		// start the hub if needed
+		if (hub.State == HubConnectionState.Disconnected)
+			await hub.StartAsync();
+	}
 }

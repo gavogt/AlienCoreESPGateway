@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.SqlServer;
 using Microsoft.Extensions.Configuration;
 using System.Reflection;
+using Syncfusion.Blazor;
+using pax.BlazorChartJs;
 namespace AlienCoreESPGateway
 {
     public static class MauiProgram
@@ -33,6 +35,11 @@ namespace AlienCoreESPGateway
 
             var hubURL = builder.Configuration["SignalR:HubURL"]!;
             var sqlConn = builder.Configuration.GetConnectionString("DefaultConnection")!;
+            var apiBase = builder.Configuration["ApiBaseUrl"]
+              ?? "http://localhost:5000";
+            builder.Services.AddScoped(sp =>
+                new HttpClient { BaseAddress = new Uri(apiBase) }
+            );
 
             builder.Services.AddSingleton(sp =>
                 new HubConnectionBuilder()
@@ -40,14 +47,23 @@ namespace AlienCoreESPGateway
                 .WithAutomaticReconnect()
                 .Build()
                 );
+            builder.Services.AddChartJs(options =>
+            {
+                options.ChartJsLocation = "https://cdn.jsdelivr.net/npm/chart.js";
+                options.ChartJsPluginDatalabelsLocation =
+                  "https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2";
+            });
 
             builder.Services.AddDbContextFactory<RegisterDBContext>(options =>
                 options.UseSqlServer(sqlConn)
             );
             builder.Services.AddScoped<RegisterDatabaseService>();
             builder.Services.AddSingleton<SessionState>();
-
-
+            builder.Services.AddChartJs(o =>
+            {
+                o.ChartJsLocation = "https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js";
+            });
+            builder.Services.AddSyncfusionBlazor();
             builder.Services.AddMauiBlazorWebView();
 
 #if DEBUG
