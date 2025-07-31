@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using System.Reflection;
 using Syncfusion.Blazor;
 using pax.BlazorChartJs;
+using OpenAI.Chat;
 namespace AlienCoreESPGateway
 {
     public static class MauiProgram
@@ -64,6 +65,13 @@ namespace AlienCoreESPGateway
                 o.ChartJsLocation = "https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js";
             });
             builder.Services.AddSyncfusionBlazor();
+
+            builder.Services.AddSingleton(sp =>
+            new ChatClient(
+                model: "gpt-3.5-turbo",
+                apiKey: Environment.GetEnvironmentVariable("OPENAI_API_KEY")
+                )
+            );
             builder.Services.AddMauiBlazorWebView();
 
 #if DEBUG

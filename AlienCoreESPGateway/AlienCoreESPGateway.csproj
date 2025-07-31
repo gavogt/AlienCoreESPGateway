@@ -93,6 +93,7 @@
         <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="9.0.51" />
+		<PackageReference Include="OpenAI" Version="2.2.0" />
 		<PackageReference Include="pax.BlazorChartJs" Version="0.8.5" />
 		<PackageReference Include="Syncfusion.Blazor.Charts" Version="30.1.42" />
     </ItemGroup>
