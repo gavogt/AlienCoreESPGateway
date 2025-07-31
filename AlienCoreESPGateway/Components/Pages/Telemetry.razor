@@ -6,6 +6,7 @@
 @using System.Linq
 @inject HubConnection hub
 @inject NavigationManager nav
+@inject TelemetryDataService telemetryDataService
 
 <div class="container mt-4">
 	<div class="row justify-content-center">
@@ -26,7 +27,7 @@
 
 				<ChartSeriesCollection>
 					<!-- NEURO -->
-					<ChartSeries DataSource="@_neuroRows"
+					<ChartSeries DataSource="@telemetryDataService._neuroRows"
 								 XName="TimeStamp"
 								 YName="Value"
 								 Type="ChartSeriesType.StackingLine"
@@ -34,7 +35,7 @@
 								 Width="2" />
 
 					<!-- PLASMA -->
-					<ChartSeries DataSource="@_plasmaRows"
+					<ChartSeries DataSource="@telemetryDataService._plasmaRows"
 								 XName="TimeStamp"
 								 YName="Value"
 								 Type="ChartSeriesType.StackingLine"
@@ -42,7 +43,7 @@
 								 Width="2" />
 
 					<!-- BIO -->
-					<ChartSeries DataSource="@_bioRows"
+					<ChartSeries DataSource="@telemetryDataService._bioRows"
 								 XName="TimeStamp"
 								 YName="Value"
 								 Type="ChartSeriesType.StackingLine"
@@ -98,13 +99,6 @@
 	private readonly List<TelemetryMessage> messages = new();
 	private string? _err;
 
-	// three series buffers, auto‐refreshing via ObservableCollection
-	private readonly ObservableCollection<ModuleRow> _neuroRows = new();
-	private readonly ObservableCollection<ModuleRow> _plasmaRows = new();
-	private readonly ObservableCollection<ModuleRow> _bioRows = new();
-
-	private const int MaxPoints = 200;
-
 	protected override async Task OnInitializedAsync()
 	{
 		// subscribe
@@ -115,31 +109,8 @@
 				var msg = JsonSerializer.Deserialize<TelemetryMessage>(payload);
 				if (msg is null) return;
 
-				// table history
-				messages.Add(msg);
-				if (messages.Count > MaxPoints)
-					messages.RemoveAt(0);
 
-				// add to row based on type
-				foreach (var mod in msg.Modules)
-				{
-					var pt = new ModuleRow(msg.Timestamp, mod.Value);
-					switch (mod.Type.ToUpperInvariant())
-					{
-						case "NEURO":
-							_neuroRows.Add(pt);
-							if (_neuroRows.Count > MaxPoints) _neuroRows.RemoveAt(0);
-							break;
-						case "PLASMA":
-							_plasmaRows.Add(pt);
-							if (_plasmaRows.Count > MaxPoints) _plasmaRows.RemoveAt(0);
-							break;
-						case "BIO":
-							_bioRows.Add(pt);
-							if (_bioRows.Count > MaxPoints) _bioRows.RemoveAt(0);
-							break;
-					}
-				}
+
 
 				InvokeAsync(StateHasChanged);
 			}
