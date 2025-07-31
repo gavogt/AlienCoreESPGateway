@@ -7,6 +7,7 @@
 @inject HubConnection hub
 @inject NavigationManager nav
 @inject TelemetryDataService telemetryDataService
+@inject GptService gptService
 
 <div class="container mt-4">
 	<div class="row justify-content-center">
@@ -15,12 +16,12 @@
 			<SfChart Height="350px" Width="700px" Title="Telemetry Modules">
 				<!-- X axis: timestamps as categories -->
 				<ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.DateTimeCategory"
-								   LabelFormat="HH:mm:ss"
-								   Title="Timestamp" />
+				LabelFormat="HH:mm:ss"
+				Title="Timestamp" />
 
 				<!-- Y axis: raw values -->
 				<ChartPrimaryYAxis Title="Value"
-								   LabelFormat="{value}" />
+				LabelFormat="{value}" />
 
 				<!-- legend at top -->
 				<ChartLegendSettings Visible="true" Position="LegendPosition.Top" />
@@ -28,29 +29,45 @@
 				<ChartSeriesCollection>
 					<!-- NEURO -->
 					<ChartSeries DataSource="@telemetryDataService.NeuroRows"
-								 XName="TimeStamp"
-								 YName="Value"
-								 Type="ChartSeriesType.StackingLine"
-								 Name="NEURO"
-								 Width="2" />
+					XName="TimeStamp"
+					YName="Value"
+					Type="ChartSeriesType.StackingLine"
+					Name="NEURO"
+					Width="2" />
 
 					<!-- PLASMA -->
 					<ChartSeries DataSource="@telemetryDataService.PlasmaRows"
-								 XName="TimeStamp"
-								 YName="Value"
-								 Type="ChartSeriesType.StackingLine"
-								 Name="PLASMA"
-								 Width="2" />
+					XName="TimeStamp"
+					YName="Value"
+					Type="ChartSeriesType.StackingLine"
+					Name="PLASMA"
+					Width="2" />
 
 					<!-- BIO -->
 					<ChartSeries DataSource="@telemetryDataService.BioRows"
-								 XName="TimeStamp"
-								 YName="Value"
-								 Type="ChartSeriesType.StackingLine"
-								 Name="BIO"
-								 Width="2" />
+					XName="TimeStamp"
+					YName="Value"
+					Type="ChartSeriesType.StackingLine"
+					Name="BIO"
+					Width="2" />
 				</ChartSeriesCollection>
 			</SfChart>
+			<div class="mt-4 p-3 border rounded">
+				<h5>Ask GPT about this data:</h5>
+				<textarea @bind="_question"
+				class="form-control"
+				rows="2"
+				placeholder="What do you want to know about this data?">
+				</textarea>
+				<button class="btn btn-primary mt-2" @onclick="AskGPT">Ask GPT</button>
+				@if (_answer is not null)
+				{
+					<div class="mt-2 p-2 bg-light border rounded">
+						<h6>GPT Answer:</h6>
+						<p>@_answer</p>
+					</div>
+				}
+			</div>
 		</div>
 	</div>
 </div>
@@ -59,7 +76,7 @@
 	<div class="card shadow-sm">
 		<div class="card-header"><h2 class="card-title">Telemetry</h2></div>
 		<div class="card-body">
-			@if (messages.Count == 0)
+			@if (telemetryDataService.messages.Count == 0)
 			{
 				<p><em>Waiting for data…</em></p>
 			}
@@ -70,7 +87,7 @@
 						<tr><th>Time</th><th>Scout ID</th><th>Module</th><th>Value</th></tr>
 					</thead>
 					<tbody>
-						@foreach (var msg in messages)
+						@foreach (var msg in telemetryDataService.messages)
 						{
 							@foreach (var mod in msg.Modules)
 							{
@@ -95,9 +112,10 @@
 }
 
 @code {
-	// raw telemetry messages for the table
-	private readonly List<TelemetryMessage> messages = new();
+
 	private string? _err;
+	private string? _question;
+	private string? _answer;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -109,8 +127,7 @@
 				var msg = JsonSerializer.Deserialize<TelemetryMessage>(payload);
 				if (msg is null) return;
 
-
-
+				telemetryDataService.AddMessage(msg);
 
 				InvokeAsync(StateHasChanged);
 			}
@@ -124,5 +141,13 @@
 		// start the hub if needed
 		if (hub.State == HubConnectionState.Disconnected)
 			await hub.StartAsync();
+	}
+
+	private async Task AskGPT()
+	{
+		if (string.IsNullOrWhiteSpace(_question))
+			return;
+
+		_answer = await gptService.AskAsync(_question);
 	}
 }

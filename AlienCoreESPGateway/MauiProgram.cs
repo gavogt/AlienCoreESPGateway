@@ -72,6 +72,8 @@ namespace AlienCoreESPGateway
                 apiKey: Environment.GetEnvironmentVariable("OPENAI_API_KEY")
                 )
             );
+            builder.Services.AddSingleton<TelemetryDataService>();
+            builder.Services.AddSingleton<GptService>();
             builder.Services.AddMauiBlazorWebView();
 
 #if DEBUG
