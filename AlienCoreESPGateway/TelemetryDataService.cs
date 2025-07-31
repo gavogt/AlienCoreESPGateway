@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace AlienCoreESPGateway
 {
-    internal class TelemetryDataService
+    public class TelemetryDataService
     {
 
         // three series buffers, auto‐refreshing via ObservableCollection
-        public readonly ObservableCollection<ModuleRow> _neuroRows = new();
-        public readonly ObservableCollection<ModuleRow> _plasmaRows = new();
-        public readonly ObservableCollection<ModuleRow> _bioRows = new();
+        public readonly ObservableCollection<ModuleRow> NeuroRows = new();
+        public readonly ObservableCollection<ModuleRow> PlasmaRows = new();
+        public readonly ObservableCollection<ModuleRow> BioRows = new();
 
         public const int MaxPoints = 20; // max points in each series
 
@@ -33,16 +33,16 @@ namespace AlienCoreESPGateway
                 switch (mod.Type.ToUpperInvariant())
                 {
                     case "NEURO":
-                        _neuroRows.Add(pt);
-                        if (_neuroRows.Count > MaxPoints) _neuroRows.RemoveAt(0);
+                        NeuroRows.Add(pt);
+                        if (NeuroRows.Count > MaxPoints) NeuroRows.RemoveAt(0);
                         break;
                     case "PLASMA":
-                        _plasmaRows.Add(pt);
-                        if (_plasmaRows.Count > MaxPoints) _plasmaRows.RemoveAt(0);
+                        PlasmaRows.Add(pt);
+                        if (PlasmaRows.Count > MaxPoints) PlasmaRows.RemoveAt(0);
                         break;
                     case "BIO":
-                        _bioRows.Add(pt);
-                        if (_bioRows.Count > MaxPoints) _bioRows.RemoveAt(0);
+                        BioRows.Add(pt);
+                        if (BioRows.Count > MaxPoints) BioRows.RemoveAt(0);
                         break;
                 }
             }

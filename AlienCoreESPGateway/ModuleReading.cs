@@ -7,7 +7,7 @@ using System.Text.Json.Serialization;
 
 namespace AlienCoreESPGateway
 {
-    internal class ModuleReading
+    public class ModuleReading
     {
         [JsonPropertyName("type")]
         public string Type { get; set; } = default!;

@@ -7,7 +7,7 @@ using System.Text.Json.Serialization;
 
 namespace AlienCoreESPGateway
 {
-    internal class TelemetryMessage
+    public class TelemetryMessage
     {
         [JsonPropertyName("scoutId")]
         public string ScoutId { get; set; } = default!;

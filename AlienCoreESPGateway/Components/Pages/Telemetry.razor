@@ -27,7 +27,7 @@
 
 				<ChartSeriesCollection>
 					<!-- NEURO -->
-					<ChartSeries DataSource="@telemetryDataService._neuroRows"
+					<ChartSeries DataSource="@telemetryDataService.NeuroRows"
 								 XName="TimeStamp"
 								 YName="Value"
 								 Type="ChartSeriesType.StackingLine"
@@ -35,7 +35,7 @@
 								 Width="2" />
 
 					<!-- PLASMA -->
-					<ChartSeries DataSource="@telemetryDataService._plasmaRows"
+					<ChartSeries DataSource="@telemetryDataService.PlasmaRows"
 								 XName="TimeStamp"
 								 YName="Value"
 								 Type="ChartSeriesType.StackingLine"
@@ -43,7 +43,7 @@
 								 Width="2" />
 
 					<!-- BIO -->
-					<ChartSeries DataSource="@telemetryDataService._bioRows"
+					<ChartSeries DataSource="@telemetryDataService.BioRows"
 								 XName="TimeStamp"
 								 YName="Value"
 								 Type="ChartSeriesType.StackingLine"
