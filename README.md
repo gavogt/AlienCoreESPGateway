@@ -1,3 +1,5 @@
+ESP8266 Xeno-Cyborg Scout Network
+
 Firmware: main.c / .inoGateway & UI: .NET 9.0 MAUI Blazor Hybrid
 
 📜 Scenario Overview
@@ -20,11 +22,9 @@ Exposes real-time & historical APIs to a .NET MAUI Blazor Hybrid Command Interfa
 
 1. ESP8266 Scout Firmware
 
-• Xeno-Module Abstraction
+Xeno-Module Abstraction
 
-Support up to 50 unknown modules, at minimum:
-
-NeuroFlux, PlasmaDensity, BioResonance
+Support up to 50 unknown modules, at minimum: NeuroFlux, PlasmaDensity, BioResonance
 
 Define:
 
@@ -36,23 +36,19 @@ struct XenoCore {
 };
 // register in: XenoCore modules[50];
 
-Unrecognized modules return NAN and log "Unknown Core" over Serial
+Unrecognized modules return NAN and log “Unknown Core” over Serial
 
-• Warp-Stable Connectivity
+Warp-Stable Connectivity
 
 Join the Wi-Fi SSID CyborgNet with exponential back-off
 
 Feed the hardware watchdog (ESP.wdtFeed()) during long loops
 
-• XenoTelemetry Uplink
+XenoTelemetry Uplink
 
-Option A: Publish JSON over MQTT to topic
+Option A: Publish JSON over MQTT to topic xeno/{scoutId}/telemetry
 
-xeno/{scoutId}/telemetry
-
-Option B: POST JSON to
-
-https://<gateway>/api/xeno/telemetry
+Option B: POST JSON to https://<gateway>/api/xeno/telemetry
 
 Example Payload:
 
@@ -66,15 +62,15 @@ Example Payload:
   ]
 }
 
-• Persistent Configuration (SPIFFS)
+Persistent Configuration (SPIFFS)
 
-Store Wi-Fi credentials & Gateway URL in /cfg/xenoconfig.json
+Store Wi-Fi credentials and Gateway URL in /cfg/xenoconfig.json
 
 Provide a Serial menu to list, select, or override saved networks/endpoints
 
 2. Cyborg Edge Gateway Service
 
-• Deployment (Docker Compose)
+Deployment (Docker Compose)
 
 QuantumQueue (RabbitMQ)
 
@@ -84,35 +80,33 @@ TimeVaultDB (InfluxDB or SQLite TS)
 
 Nginx for TLS termination
 
-• Ingestion & Bridging
+Ingestion & Bridging
 
 Consume MQTT or HTTP from Scouts
 
 Publish to xenotelemetry exchange or broadcast via SignalR (XenoHub)
 
-• Validation & Storage
+Validation & Storage
 
-XenoBridge:
+XenoBridge handles:
 
-Validates “cosmic signatures”
+Validation of incoming data
 
-Enriches with calibration metadata
+Enrichment with calibration metadata
 
-Persists to TimeVaultDB
+Persistence to TimeVaultDB
 
-Emits MediatR events (XenoTelemetryReceived)
+Emission of MediatR events (XenoTelemetryReceived)
 
 3. Real-Time Streams & Commands
 
-• SignalR Hub (XenoHub)
+SignalR Hub (XenoHub)
 
-Broadcast incoming readings:
+Broadcast incoming readings via OnTelemetry(scoutId, type, value)
 
-OnTelemetry(scoutId, type, value)
+Accept commands (e.g. CalibrateCore, RebootScout) from UI and forward to Scouts via MQTT/HTTP
 
-Accept UI commands (CalibrateCore, RebootScout) and forward to Scouts via MQTT/HTTP
-
-• RabbitMQ Alternative
+RabbitMQ Alternative
 
 Topics: xenotelemetry, xenocommands
 
@@ -120,99 +114,89 @@ Routing keys: scout.{id}
 
 4. .NET MAUI Blazor Hybrid Command Interface
 
-• Live Scout Dashboard
+Live Scout Dashboard
 
-<ScoutCard> per Scout: status, module count, latest readings
+<ScoutCard> per Scout node showing status, module count, and last readings
 
-<FluxChart>: real-time graphs of NeuroFlux, PlasmaDensity, BioResonance
+<FluxChart> renders real-time graphs for NeuroFlux, PlasmaDensity, BioResonance
 
-• Historical Analysis
+Historical Analysis
 
-REST:
-
-GET /api/xeno/history?scout={id}&from={ts}&to={ts}
+Expose REST endpoint: GET /api/xeno/history?scout={id}&from={ts}&to={ts}
 
 UI controls: date-range slider, module-type filters, scout search
 
-• Command Center
+Command Center
 
-Buttons for CalibrateCore(coreIndex) & DeployFirmware
+Buttons for actions like CalibrateCore(coreIndex) or DeployFirmware
 
-Animated toasts for ACKs/errors
+Animated toasts for acknowledgments or errors
 
-• Advanced Visualization & AI Insights
+Advanced Visualization & AI Insights
 
-Heatmaps with Chart.js for module value distributions
+Heatmap visualizations with Chart.js for module value distributions
 
-Embedded LLM widget for anomaly detection & calibration suggestions
+Embedded AI/LLM widget for anomaly detection and calibration suggestions
 
-• Theming & Accessibility
+Theming & Accessibility
 
-Light/dark toggle with CSS vars (--cyborg-green, --void-purple, --signal-gold)
+Light/dark toggle with CSS variables: --cyborg-green, --void-purple, --signal-gold
 
-Responsive layout: collapsible sidebar, hamburger menu
+Responsive layout (collapsible sidebar, mobile menu)
 
-ARIA roles, keyboard nav, contrast ≥ 4.5:1
+ARIA roles, keyboard navigation, minimum contrast ratio of 4.5:1
 
 🛠 Configuration & Management
 
-Local Data Store: EF Core + SQLite (scout registry, metadata, user prefs)
+Local Data Store: EF Core + SQLite (scout registry, module metadata, user preferences)
 
-Patterns: Repository, Unit-of-Work
+Design Patterns: Repository, Unit of Work
 
-Migrations: EF Core migrations + scouts.db schema
+Database Migrations: EF Core migrations + scouts.db schema file
 
 🏗 Design & Architecture
 
-.NET 9.0 + C# 12: file-scoped namespaces, required props, pattern matching
+Technology: .NET 9.0, C# 12 (file-scoped namespaces, required properties, pattern matching)
 
-Key Patterns: Factory, Strategy, Command, Observer, Mediator/CQRS, Repository
+Key Patterns: Factory, Strategy, Command, Observer, Mediator/CQRS
 
 Project Structure:
 
-/Firmware   (wifi.c/.h, xenocore.c/.h, comm.c/.h)
-/Gateway    (XenoApi, XenoBridge)
-/UI         (CommandInterface)
+/Firmware (ESP8266 code: wifi.c/h, xenocore.c/h, comm.c/h)
 
-Containerization: Docker Compose (RabbitMQ, TimeVaultDB); optional k3d
+/Gateway (XenoApi, XenoBridge services)
 
-Security: TLS, JWT/API tokens, RabbitMQ ACLs, encrypted SPIFFS
+/UI (Blazor MAUI Command Interface)
+
+Containerization: Docker Compose for RabbitMQ, TimeVaultDB (optionally k3d)
+
+Security: TLS, JWT/API tokens, RabbitMQ ACLs, encrypted SPIFFS configuration
 
 🚀 Getting Started
 
-ESP8266 Firmware
+Scaffold ESP8266 firmware: Wi-Fi, SPIFFS, XenoCore readings, telemetry uplink
 
-Scaffold Wi-Fi + SPIFFS + XenoCore reads + telemetry uplink
+Scaffold .NET MAUI Blazor Hybrid UI: SignalR client, EF Core, initial pages
 
-.NET MAUI Hybrid UI
+Build Edge Gateway: ingest telemetry, bridge to RabbitMQ/SignalR, persist data
 
-Add SignalR client, EF Core, initial pages
+Create UI components: <ScoutCard>, <FluxChart>, <CommandPanel>
 
-Edge Gateway
-
-Ingest, bridge, persist data
-
-UI Components
-
-<ScoutCard>, <FluxChart>, <CommandPanel>
-
-Run Locally
-
-Docker Compose for RabbitMQ & TimeVaultDB
+Run locally with Docker Compose (RabbitMQ & TimeVaultDB)
 
 📦 Deliverables
 
-ESP8266 firmware source (main.c/.ino) + build config
+ESP8266 firmware source (main.c/.ino) + build configuration
 
-.NET solution with /Gateway and /UI projects
+.NET solution containing /Gateway and /UI projects
 
-Docker Compose for RabbitMQ & TimeVaultDB
+Docker Compose files for RabbitMQ and TimeVaultDB
 
-EF Core migrations & scouts.db
+EF Core migration scripts and scouts.db schema
 
-README: architecture diagram, setup steps, pattern mapping
+README with architecture diagram, setup instructions, and design patterns
 
-Demo video: live telemetry, heatmaps, AI insights
+Demonstration video showcasing live telemetry, heatmaps, and AI insights
 
 ### INSTRUCTIONS ###
 1. Set up appsettings.json in both projects
