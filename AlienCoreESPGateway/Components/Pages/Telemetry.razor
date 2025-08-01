@@ -11,70 +11,75 @@
 
 <div class="container mt-4">
 	<div class="row justify-content-center">
-		<div class="col-auto">
-			<h3 class="text-center">Syncfusion ChartJs</h3>
-			<SfChart Height="350px" Width="700px" Title="Telemetry Modules">
-				<!-- X axis: timestamps as categories -->
-				<ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.DateTimeCategory"
-				LabelFormat="HH:mm:ss"
-				Title="Timestamp" />
+		<div class="col-12 col-md-10 col-lg-8">
+			<div class="card mb-4">
+				<div class="card-header"><strong>Live Telemetry Chart</strong></div>
+				<div class="card-body">
+					<SfChart Height="350px" Width="700px" Title="Telemetry Modules">
+						<!-- X axis: timestamps as categories -->
+						<ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.DateTimeCategory"
+										   LabelFormat="HH:mm:ss"
+										   Title="Timestamp" />
 
-				<!-- Y axis: raw values -->
-				<ChartPrimaryYAxis Title="Value"
-				LabelFormat="{value}" />
+						<!-- Y axis: raw values -->
+						<ChartPrimaryYAxis Title="Value"
+										   LabelFormat="{value}" />
 
-				<!-- legend at top -->
-				<ChartLegendSettings Visible="true" Position="LegendPosition.Top" />
+						<!-- legend at top -->
+						<ChartLegendSettings Visible="true" Position="LegendPosition.Top" />
 
-				<ChartSeriesCollection>
-					<!-- NEURO -->
-					<ChartSeries DataSource="@telemetryDataService.NeuroRows"
-					XName="TimeStamp"
-					YName="Value"
-					Type="ChartSeriesType.StackingLine"
-					Name="NEURO"
-					Width="2" />
+						<ChartSeriesCollection>
+							<!-- NEURO -->
+							<ChartSeries DataSource="@telemetryDataService.NeuroRows"
+										 XName="TimeStamp"
+										 YName="Value"
+										 Type="ChartSeriesType.StackingLine"
+										 Name="NEURO"
+										 Width="2" />
 
-					<!-- PLASMA -->
-					<ChartSeries DataSource="@telemetryDataService.PlasmaRows"
-					XName="TimeStamp"
-					YName="Value"
-					Type="ChartSeriesType.StackingLine"
-					Name="PLASMA"
-					Width="2" />
+							<!-- PLASMA -->
+							<ChartSeries DataSource="@telemetryDataService.PlasmaRows"
+										 XName="TimeStamp"
+										 YName="Value"
+										 Type="ChartSeriesType.StackingLine"
+										 Name="PLASMA"
+										 Width="2" />
 
-					<!-- BIO -->
-					<ChartSeries DataSource="@telemetryDataService.BioRows"
-					XName="TimeStamp"
-					YName="Value"
-					Type="ChartSeriesType.StackingLine"
-					Name="BIO"
-					Width="2" />
-				</ChartSeriesCollection>
-			</SfChart>
-			<div class="mt-4 p-3 border rounded">
-				<h5>Ask GPT about this data:</h5>
-				<textarea @bind="_question"
-				class="form-control"
-				rows="2"
-				placeholder="What do you want to know about this data?">
-				</textarea>
-				<button class="btn btn-primary mt-2" @onclick="AskGPT">Ask GPT</button>
-				@if (_answer is not null)
-				{
-					<div class="mt-2 p-2 bg-light border rounded">
-						<h6>GPT Answer:</h6>
-						<p>@_answer</p>
+							<!-- BIO -->
+							<ChartSeries DataSource="@telemetryDataService.BioRows"
+										 XName="TimeStamp"
+										 YName="Value"
+										 Type="ChartSeriesType.StackingLine"
+										 Name="BIO"
+										 Width="2" />
+						</ChartSeriesCollection>
+					</SfChart>
+				</div>
+			</div>
+			<div class="card mb-4">
+				<div class="card-header"><strong>Ask GPT about the Data</strong></div>
+				<div class="card-body">
+					<div class="input-group">
+						<textarea @bind="_question"
+								  class="form-control"
+								  rows="2"
+								  placeholder="What do you want to know about this data?">
+						</textarea>
+						<button class="btn btn-primary mt-2" @onclick="AskGPT">Ask GPT</button>
+
+						@if (_answer is not null)
+						{
+							<div class="mt-2 p-2 bg-light border rounded">
+								<h6>GPT Answer:</h6>
+								<p>@_answer</p>
+							</div>
+						}
 					</div>
-				}
+				</div>
 			</div>
 		</div>
-	</div>
-</div>
-<!-- ============ RAW TABLE ============ -->
-<div class="container mt-4">
-	<div class="card shadow-sm">
-		<div class="card-header"><h2 class="card-title">Telemetry</h2></div>
+		<div class="card mb-4">
+		<div class="card-header"><strong>Telemetry</strong></div>
 		<div class="card-body">
 			@if (telemetryDataService.messages.Count == 0)
 			{
@@ -102,10 +107,10 @@
 					</tbody>
 				</table>
 			}
+			</div>
 		</div>
 	</div>
 </div>
-
 @if (!string.IsNullOrWhiteSpace(_err))
 {
 	<div class="alert alert-danger mt-3">@_err</div>
