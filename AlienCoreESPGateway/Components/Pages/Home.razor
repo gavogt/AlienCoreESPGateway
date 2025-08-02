@@ -1,90 +1,20 @@
 ﻿@page "/"
+@inject NavigationManager nav
 
-<div class="container my-4">
-    <div class="row">
-        <div class="col-md-4 mb-4">
-            <div class="card shadow-sm h-100">
-                <img src="images/kazir.png" alt="AlienCore ESP Gateway Logo" class="card-img-top" />
-                <div class="card-body">
-                    <p>
-                        In the far reaches of the <strong>Zeta Reticuli</strong> system, a
-                        brilliant cybernetic engineer named <em>Ka’Zir Vel‑Tarn</em> emerged
-                        from the Stellar Mind Halls—a place where only the most advanced
-                        hybrid beings trained in quantum logic and extrasensory synchronization
-                        were educated.
-                    </p>
-                    <p>
-                        Gifted with a rare neural augmentation known as the
-                        <strong>Neuro‑Spatial Relay Cortex</strong>, Ka’Zir developed the ability
-                        to interface with both machine code and higher‑dimensional frequencies
-                        simultaneously. This gave him insight into the subtle threads of
-                        consciousness traveling across the stars—what humans call ESP.
-                    </p>
-                    <p>
-                        During his time stationed near Earth as part of the Galactic
-                        Observational Accord, Ka’Zir witnessed the chaos and inefficiency in
-                        human data systems. Yet he saw potential in the fusion of human
-                        intuition and Zetan technology. Driven by this vision, he created the
-                        <strong>AlienCoreESPGateway</strong>—a bridge between Earth’s
-                        signal‑based technologies and cosmic cognitive telemetry.
-                    </p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-8 mb-4">
-            <div class="card shadow-sm mb-4">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Home</h5>
-                </div>
-                <div class="card-body">
-                    <p class="card-text">This is the home page of the AlienCore ESP Gateway application.</p>
-                    <p>Use the navigation menu to explore different features and functionalities.</p>
-                </div>
-            </div>
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">The Origin of AlienCoreESPGateway</h5>
-                    </div>
-                    <p>
-                        In the early 2030s, deep within a classified sector of the Mojave
-                        Desert, an enigmatic facility known only as the
-                        <strong>AlienCoreESPGateway</strong> emerged—its architecture unlike
-                        anything built by human hands. Designed in collaboration between
-                        Earth’s brightest engineers and a Zeta Reticulan visionary named
-                        <strong>Ka’zir</strong>, the gateway was more than just a tech hub; it
-                        was a bridge between civilizations.
-                    </p>
-                    <p>
-                        Ka’zir, a cybernetic diplomat and systems architect from the Zeta star
-                        system, arrived on Earth during a covert knowledge exchange program
-                        initiated after the First Contact Accords. With advanced knowledge of
-                        neural mesh computing and quantum coherence telemetry, Ka’zir sought
-                        to solve one of humanity’s greatest challenges: secure, high‑bandwidth,
-                        multidimensional data transfer between human‑operated edge devices and
-                        the XenoGrid—a galactic information network used by hundreds of species.
-                    </p>
-                    <p>
-                        Together with a coalition of human scientists and AI systems, Ka’zir
-                        introduced the concept of the <strong>ESP Gateway</strong>—a hybrid
-                        infrastructure combining Earth’s emerging technologies with Zeta
-                        cybernetic protocols. The <strong>AlienCoreESPGateway</strong> was born
-                        as a multi‑platform telemetry system capable of ingesting
-                        quantum‑signed data from field devices (“Scouts”), validating their
-                        origin using cosmic entropy signatures, and securely transmitting them
-                        through a RabbitMQ‑backed <em>QuantumQueue</em> and into the
-                        <em>TimeVaultDB</em>.
-                    </p>
-                    <p>
-                        Today, the facility not only powers interplanetary research missions
-                        but also enables secure cosmic communication through its real‑time
-                        SignalR hub known as <strong>XenoHub</strong>. Ka’zir, now a respected
-                        emissary, continues to evolve the platform—ensuring AlienCoreESPGateway
-                        remains the Earth's vanguard into a connected galactic future.
-                    </p>
-                    <img src="images/aliencoreespgateway.png" alt="AlienCore ESP Gateway Logo" class="img-fluid rounded-end" />
-                </div>
-            </div>
-        </div>
+<div class="splash-bg">
+    <div class="splash-content">
+        <img src="images/logo.png" alt="AlienCore Logo" class="splash-logo" />
+        <h1>Welcome to AlienCore ESP Gateway</h1>
+        <p class="lead">Bridging edge telemetry with AI ChatGPT powered insights</p>
+        <button class="btn btn-primary btn-lg mt-3" @onclick="EnterApp">
+            Go to Login
+        </button>
     </div>
 </div>
+
+@code {
+    private void EnterApp()
+    {
+        nav.NavigateTo("/login");
+    }
+}
