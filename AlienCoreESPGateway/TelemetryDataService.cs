@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Microsoft.JSInterop;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace AlienCoreESPGateway
@@ -17,14 +19,14 @@ namespace AlienCoreESPGateway
 
         public const int MaxPoints = 20; // max points in each series
 
-        public List<TelemetryMessage> messages { get; } = new();
+        public List<TelemetryMessage> Messages { get; } = new();
 
         public void AddMessage(TelemetryMessage msg)
         {
             // table history
-            messages.Add(msg);
-            if (messages.Count > MaxPoints)
-                messages.RemoveAt(0);
+            Messages.Add(msg);
+            if (Messages.Count > MaxPoints)
+                Messages.RemoveAt(0);
 
             // add to row based on type
             foreach (var mod in msg.Modules)
@@ -47,5 +49,27 @@ namespace AlienCoreESPGateway
                 }
             }
         }
+
+        // Exposed to JS so React can pull in live data
+        [JSInvokable]
+        public string GetTelemetry()
+        {
+            // Build chart-friendly points by zipping the three series
+            var chartData = NeuroRows
+                .Select((n, i) => new {
+                    timestamp = n.TimeStamp,
+                    NEURO = n.Value,
+                    PLASMA = i < PlasmaRows.Count ? PlasmaRows[i].Value : 0,
+                    BIO = i < BioRows.Count ? BioRows[i].Value : 0
+                })
+                .ToArray();
+
+            return JsonSerializer.Serialize(new
+            {
+                chartData,
+                messages = Messages
+            });
+        }
     }
+
 }
