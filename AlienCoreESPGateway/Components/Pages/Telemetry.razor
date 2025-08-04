@@ -81,7 +81,7 @@
 		<div class="card mb-4">
 		<div class="card-header"><strong>Telemetry</strong></div>
 		<div class="card-body">
-			@if (telemetryDataService.messages.Count == 0)
+			@if (telemetryDataService.Messages.Count == 0)
 			{
 				<p><em>Waiting for data…</em></p>
 			}
@@ -92,7 +92,7 @@
 						<tr><th>Time</th><th>Scout ID</th><th>Module</th><th>Value</th></tr>
 					</thead>
 					<tbody>
-						@foreach (var msg in telemetryDataService.messages)
+						@foreach (var msg in telemetryDataService.Messages)
 						{
 							@foreach (var mod in msg.Modules)
 							{

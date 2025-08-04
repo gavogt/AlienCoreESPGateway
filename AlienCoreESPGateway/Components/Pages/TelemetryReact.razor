@@ -1,0 +1,26 @@
+﻿@page "/telemetry-react"
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+@inject TelemetryDataService telemetryDataService
+
+<div id="react-telemetry"></div>
+
+@code {
+    private IJSObjectReference? _reactModule;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        // 1) only import – we don't need the returned module object
+        await JS.InvokeVoidAsync("import", "./react/assets/index.js");
+
+        // 2) call the *global* that the bundle placed on window
+        await JS.InvokeVoidAsync(
+            "renderTelemetry",
+            "react-telemetry",
+            DotNetObjectReference.Create(telemetryDataService));
+    }
+
+    public async ValueTask DisposeAsync() => await Task.CompletedTask;
+}
