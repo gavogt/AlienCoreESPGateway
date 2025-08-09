@@ -125,24 +125,26 @@ Technology Stack:
 
     Containerization: Docker Compose
 
-Project Structure:
+## 🏗 Project Structure
 
-/Firmware   # ESP8266 code (wifi.c/h, xenocore.c/h, comm.c/h)
-/Gateway    # XenoApi, XenoBridge services
-/UI         # Blazor MAUI Command Interface
+/Firmware # ESP8266 code (wifi.c/h, xenocore.c/h, comm.c/h)
+/Gateway # XenoApi, XenoBridge services
+/UI # Blazor MAUI Command Interface
 
-🚀 Getting Started
-1. Firmware
 
-    Flash ESP8266 firmware in /Firmware
+---
 
-    Configure /cfg/xenoconfig.json with:
+## 🚀 Getting Started
 
-    {
-      "wifi_ssid": "CyborgNet",
-      "wifi_pass": "********",
-      "gateway_url": "http://<server-ip>:5000"
-    }
+### 1. Firmware
+1. Flash ESP8266 firmware in `/Firmware`.
+2. Configure `/cfg/xenoconfig.json` with:
+   ```json
+   {
+     "wifi_ssid": "CyborgNet",
+     "wifi_pass": "********",
+     "gateway_url": "http://<server-ip>:5000"
+   }
 
 2. Gateway + Broker
 
@@ -158,9 +160,9 @@ dotnet ef database update
 
 4. UI
 
-    Build and run .NET MAUI Blazor Hybrid project
+    Build and run the .NET MAUI Blazor Hybrid project.
 
-    Access dashboard via configured URL
+    Access the dashboard via the configured URL.
 
 📦 Deliverables
 
@@ -174,4 +176,7 @@ EF Core migration scripts
 
 README + architecture diagram
 
-Demo video: telemetry, heatmaps, AI insights
+    Demo video showcasing live telemetry, heatmaps, and AI insights
+
+
+---
